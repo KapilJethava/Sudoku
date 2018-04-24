@@ -1,0 +1,33 @@
+.flex {
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+.text {
+    width: 45px;
+    height: 45px;
+    font-size: 25px;
+    border: 1px solid #ddd;
+    text-align:center;
+}
+.text:nth-child(3n) {
+    border-right:2px solid #777;
+}
+.text:first-child {
+    border-left:2px solid #777;
+}
+.row:first-child > .text {
+    border-top:2px solid #777;
+}
+.row:nth-child(3n) > .text {
+    border-bottom:2px solid #777;
+}
+.text:disabled {
+	background-color: yellow;
+}
