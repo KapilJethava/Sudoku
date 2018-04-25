@@ -2,7 +2,7 @@
   <div class="row" *ngFor="let row of data; let i=index">
 	  <input class="text" type="text" *ngFor="let cell of row; let j=index" 
 	  [disabled]="data[i][j].value != ''"
-	  [(ngModel)]="data[i][j].value"  (change)="resetPossiblity(i,j, data[i][j].squareNo, data[i][j].value)"/>
+	  [(ngModel)]="data[i][j].value"  (change)="resetPossiblity(i,j)"/>
   </div>
 </div>
 <button (click)="startSolving()">Solve</button>
