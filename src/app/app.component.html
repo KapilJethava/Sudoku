@@ -1,8 +1,15 @@
-<div class="flex">
-  <div class="row" *ngFor="let row of data; let i=index">
-	  <input class="text" type="text" *ngFor="let cell of row; let j=index" 
-	  [disabled]="data[i][j].value != ''"
-	  [(ngModel)]="data[i][j].value"  (change)="resetPossiblity(i,j)"/>
-  </div>
+<div class="row">
+	<div class="flex">
+		<div class="row" *ngFor="let row of data; let i=index">
+			<input class="text" type="text" *ngFor="let cell of row; let j=index" [disabled]="data[i][j].value != ''" [(ngModel)]="data[i][j].value"
+			 (change)="resetPossiblity(i,j)" />
+		</div>
+	</div>
+	<div style="padding: 15px">
+		<h3>Sudoku Resolver 1.0</h3>
+		<p>Thanks for using me.
+			<br />Please fill the entries of sudoku you have and then click on solve button.
+		</p>
+		<button (click)="startSolving()">Solve</button>
+	</div>
 </div>
-<button (click)="startSolving()">Solve</button>

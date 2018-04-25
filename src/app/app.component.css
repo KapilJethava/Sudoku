@@ -8,13 +8,17 @@
     display: flex;
     flex-direction: row;
 }
+input{
+	border: 0px;
+}
 
 .text {
     width: 45px;
     height: 45px;
     font-size: 25px;
     border: 1px solid #ddd;
-    text-align:center;
+	text-align:center;
+	
 }
 .text:nth-child(3n) {
     border-right:2px solid #777;
@@ -30,4 +34,10 @@
 }
 .text:disabled {
 	background-color: yellow;
+}
+button{
+	font-size: larger;
+    border-radius: 5px;
+    background-color: #4787ed;
+    color: #fff;
 }
