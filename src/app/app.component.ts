@@ -14,38 +14,87 @@ export class AppComponent {
 	data = [];
 	counter = 0;
 	subject = new Subject<any>();
+	show = false;
+	lastSet = [];
 
 	constructor() {
-		for (let i = 0;i < 9;i++) {
-			this.data[i] = Array(9);
-			for (let j = 0;j < 9;j++) {
-				this.data[i][j] = new Entry(i, j);
-			}
-		}
+		this.reset();
 		this.subject.subscribe(({ row, column, value }) => {
-			this.data[row][column].value = this.data[row][column].possibility[0];
+			this.data[row][column].value = value;
 			this.resetPossiblity(row, column);
+			if(this.lastSet.length == 3) {
+				//remove last one
+				this.lastSet.splice(2, 1);
+			}
+			this.lastSet.unshift({row, column})
+			
 			if (this.counter < 81) {
 				setTimeout(() => {
 					this.startSolving();
-				}, 1000);
+				}, 200);
+			} else {
+				this.lastSet.splice(0,3);
+				this.show = true;
 			}
 		}, (err) => console.log(err));
 	}
+
 	startSolving = () => {
+		if(this.counter == 0) {
+			alert("Entries required!");
+			return;
+		}
+		//Level 1 resolving
 		for (let i = 0;i < 9;i++) {
 			for (let j = 0;j < 9;j++) {
 				if (this.data[i][j].possibility.length === 1) {
 					this.subject.next({ row: i, column: j, value: this.data[i][j].possibility[0] });
-
-					// console.log("Run Count => ", this.counter);
-					// console.log("Resolved Entry => Row(",i,"), Column(", j,") with value=", this.data[i][j].possibility[0]);
 					return;
 				}
 			}
 		}
-		alert("Sorry, this sudoku lies under difficult category, will be resolved by next version.")
+		//this.show = true;
+		this.level2Solving();
 	}
+
+	level2Solving = () => {
+		// console.log("second level resolving started");
+		var data = _.flatMap(this.data, (row) => row);
+		var arr = [];
+		for (let value = 1;value < 10;value++) {
+			for (let i = 0;i < 9;i++) {
+				// For Row
+				arr = _.filter(this.data[i], (cell) => cell.possibility.includes(value));
+				if (arr.length == 1) {
+					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
+					// console.log("Row Resolved=>", arr, value);
+					return;
+				}
+			}
+			
+			for (let i = 0; i< 9;i++) {
+				// For column
+				arr = _.filter(data, (cell) => cell.column == i && cell.possibility.includes(value));
+				if (arr.length == 1) {
+					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
+					// console.log("Column Resolved=>", arr, value);
+					return;
+				}
+			}
+
+			for (let i = 1;i < 10;i++) {
+				// For square
+				arr = _.filter(data, (cell) => cell.squareNo == i && cell.possibility.includes(value));
+				if (arr.length == 1) {
+					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
+					// console.log("Square Resolved=>", arr, value);
+					return;
+				}
+			}
+		}
+		alert("Its very tuff, might be resolved in next version");
+	};
+
 	resetPossiblity = (row, column) => {
 		const squareNum = this.data[row][column].squareNo;
 		var value;
@@ -81,6 +130,22 @@ export class AppComponent {
 		} else {
 
 		}
+	}
 
+	reset = () => {
+		for (let i = 0;i < 9;i++) {
+			this.data[i] = Array(9);
+			for (let j = 0;j < 9;j++) {
+				this.data[i][j] = new Entry(i, j);
+			}
+		}
+		this.counter = 0;
+	};
+
+	getClass = (i, j) => {
+		return (this.lastSet[2] && this.lastSet[2].row == i && this.lastSet[2].column == j) ? 'last3' :
+			(this.lastSet[1] && this.lastSet[1].row == i && this.lastSet[1].column == j) ? 'last2' :
+				(this.lastSet[0] && this.lastSet[0].row == i && this.lastSet[0].column == j) ? 'last1' : 
+				(this.data[i][j].value != '') ? 'yellowBg' : '';
 	}
 }
