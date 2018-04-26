@@ -139,6 +139,7 @@ export class AppComponent {
 				this.data[i][j] = new Entry(i, j);
 			}
 		}
+		this.show = false;
 		this.counter = 0;
 	};
 
