@@ -92,7 +92,7 @@ export class AppComponent {
 				}
 			}
 		}
-		alert("Its very tuff, might be resolved in next version");
+		alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
 	};
 
 	validateEntry = (e, row, colm) => {
