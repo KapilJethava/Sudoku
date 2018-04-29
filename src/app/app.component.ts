@@ -22,25 +22,25 @@ export class AppComponent {
 		this.subject.subscribe(({ row, column, value }) => {
 			this.data[row][column].value = value;
 			this.resetPossiblity(row, column);
-			if(this.lastSet.length == 3) {
+			if (this.lastSet.length == 3) {
 				//remove last one
 				this.lastSet.splice(2, 1);
 			}
-			this.lastSet.unshift({row, column})
-			
+			this.lastSet.unshift({ row, column })
+
 			if (this.counter < 81) {
 				setTimeout(() => {
 					this.startSolving();
 				}, 200);
 			} else {
-				this.lastSet.splice(0,3);
+				this.lastSet.splice(0, 3);
 				this.show = true;
 			}
 		}, (err) => console.log(err));
 	}
 
 	startSolving = () => {
-		if(this.counter == 0) {
+		if (this.counter == 0) {
 			alert("Entries required!");
 			return;
 		}
@@ -71,8 +71,8 @@ export class AppComponent {
 					return;
 				}
 			}
-			
-			for (let i = 0; i< 9;i++) {
+
+			for (let i = 0;i < 9;i++) {
 				// For column
 				arr = _.filter(data, (cell) => cell.column == i && cell.possibility.includes(value));
 				if (arr.length == 1) {
@@ -93,6 +93,37 @@ export class AppComponent {
 			}
 		}
 		alert("Its very tuff, might be resolved in next version");
+	};
+
+	validateEntry = (e, row, colm) => {
+		const keyCode = e.which || e.keyCode;
+		const entry = this.data[row][colm];
+		const value = +e.key;
+		if (keyCode < 48 || keyCode > 57) {
+			alert('Only numeric value is allowed.');
+			return false;
+		} 
+	
+		var data = _.flatMap(this.data, (rw) => rw);
+		var arr = _.filter(this.data[row], (cell) => cell.value == value);
+		if (arr.length > 0) {
+			alert('Same row already has an entry of '+ value + '.');
+			return false;
+		}
+
+		arr = _.filter(data, (cell) => cell.column == colm && cell.value == value);
+		if (arr.length > 0) { 
+			alert('Same column already has an entry of ' + value + '.');
+			return false;
+		}
+
+		arr = _.filter(data, (cell) => cell.squareNo == entry.squareNo && cell.value == value);
+		if (arr.length > 0) {
+			alert('Same square already has an entry of ' + value + '.');
+			return false;
+		}
+
+		return true;
 	};
 
 	resetPossiblity = (row, column) => {
@@ -146,7 +177,7 @@ export class AppComponent {
 	getClass = (i, j) => {
 		return (this.lastSet[2] && this.lastSet[2].row == i && this.lastSet[2].column == j) ? 'last3' :
 			(this.lastSet[1] && this.lastSet[1].row == i && this.lastSet[1].column == j) ? 'last2' :
-				(this.lastSet[0] && this.lastSet[0].row == i && this.lastSet[0].column == j) ? 'last1' : 
-				(this.data[i][j].value != '') ? 'yellowBg' : '';
+				(this.lastSet[0] && this.lastSet[0].row == i && this.lastSet[0].column == j) ? 'last1' :
+					(this.data[i][j].value != '') ? 'yellowBg' : '';
 	}
 }

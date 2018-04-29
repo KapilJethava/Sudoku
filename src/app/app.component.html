@@ -2,7 +2,9 @@
 <div class="container">
 	<div class="flex">
 		<div class="row" *ngFor="let row of data; let i=index">
-			<input class="text" type="text" *ngFor="let cell of row; let j=index" [disabled]="data[i][j].value != ''" [(ngModel)]="data[i][j].value"
+			<input class="text" type="text" 
+			minlength="1" maxlength="1" (keydown)="validateEntry($event, i, j)"
+			*ngFor="let cell of row; let j=index" [disabled]="data[i][j].value != ''" [(ngModel)]="data[i][j].value"
 			 [ngClass]="getClass(i,j)" (change)="resetPossiblity(i,j)" />
 		</div>
 	</div>
