@@ -16,6 +16,7 @@ export class AppComponent {
 	subject = new Subject<any>();
 	show = false;
 	lastSet = [];
+	debug = false;
 
 	constructor() {
 		this.reset();
@@ -69,6 +70,8 @@ export class AppComponent {
 					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
 					// console.log("Row Resolved=>", arr, value);
 					return;
+				} else {
+					
 				}
 			}
 
@@ -92,9 +95,16 @@ export class AppComponent {
 				}
 			}
 		}
+		this.debug = true;
 		alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
 	};
 
+	level3Solving = () => {
+		var data = _.flatMap(this.data, (row) => row);
+		var arr = [];
+
+
+	}
 	validateEntry = (e, row, colm) => {
 		const keyCode = e.which || e.keyCode;
 		const entry = this.data[row][colm];
@@ -172,6 +182,7 @@ export class AppComponent {
 		}
 		this.show = false;
 		this.counter = 0;
+		this.lastSet.splice(0, 3);
 	};
 
 	getClass = (i, j) => {
