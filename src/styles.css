@@ -21,6 +21,8 @@ body input{
 .container .table {
 	border-collapse: collapse;
 	border: 2px solid #888;
+	max-width: 480px;
+	max-height: 480px;
 }
 .container .table tr:nth-child(3n):not(:last-child) td{
 	border-bottom:2px solid #888;

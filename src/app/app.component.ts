@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { Entry } from './Entry';
 import { SquareMatrix } from './SquareMatrix';
 import { Subject } from 'rxjs/Subject';
+import { testData } from './testData';
 
 @Component({
 	selector: 'app-root',
@@ -14,12 +15,21 @@ export class AppComponent {
 	data = [];
 	counter = 0;
 	subject = new Subject<any>();
+	retry = new Subject<any>();
 	show = false;
 	lastSet = [];
 	debug = false;
+	attempt = 1;
 
 	constructor() {
-		this.reset();
+		if (this.debug) {
+			this.data = _.cloneDeep(testData);
+			this.counter = _.filter(_.flatMap(this.data, (r) => r), (entry) => entry.value != '').length;
+		}
+		else {
+			this.reset();
+		}
+
 		this.subject.subscribe(({ row, column, value }) => {
 			this.data[row][column].value = value;
 			this.resetPossiblity(row, column);
@@ -38,6 +48,16 @@ export class AppComponent {
 				this.show = true;
 			}
 		}, (err) => console.log(err));
+
+		this.retry.subscribe(() => {
+			if (this.attempt < 100) {
+				setTimeout(() => {
+					this.startSolving();
+				}, 200);
+			}
+			console.log("Attempt => ", this.attempt);
+			this.attempt++;
+		}, (err) => console.log(err))
 	}
 
 	startSolving = () => {
@@ -92,11 +112,11 @@ export class AppComponent {
 					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
 					// console.log("Column Resolved=>", arr, value);
 					return;
-				} else if(arr.length > 0) {
+				} else if (arr.length > 0) {
 					// check weather some column in array is assumed to have some specific values? if so then other cells of that square should not have that value as possibility
 					let sqNo = arr[0].squareNo;
-					let filtered = _.filter(arr, (val)=>val.squareNo == sqNo);
-					if(filtered.length == arr.length) {
+					let filtered = _.filter(arr, (val) => val.squareNo == sqNo);
+					if (filtered.length == arr.length) {
 						filtered = _.filter(data, (entry) => entry.column != i && entry.squareNo == sqNo && entry.possibility.includes(value))
 						_.forEach(filtered, (entry) => {
 							let index = entry.possibility.indexOf(value);
@@ -117,19 +137,38 @@ export class AppComponent {
 				}
 			}
 		}
-		
-
-
-
-		this.debug = true;
-		alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
+		this.level3Solving(data);
 	};
 
-	level3Solving = () => {
-		var data = _.flatMap(this.data, (row) => row);
-		var arr = [];
+	level3Solving = (data) => {
+		data = _.filter(data, (entry) => entry.value == '');
 
-
+		const resetEntries = (entityId, propName) => {
+			var entityArr = _.filter(data, (entry) => entry[propName] == entityId);
+			for (let j = 0;j < entityArr.length;j++) {
+				var arr = _.filter(entityArr, (entry) => _.isEqual(entityArr[j].possibility, entry.possibility));
+				if (arr.length > 1 && arr.length == arr[0].possibility.length) {
+					console.log("found in "+ propName +"=>", arr);
+					let filtered = _.filter(entityArr, (entry) => !arr.includes(entry));
+					console.log("filtered in " + propName +  "=>", filtered);
+					_.forEach(arr[0].possibility, (value) => {
+						_.forEach(filtered, (entry) => {
+							let index = entry.possibility.indexOf(value);
+							if (index > -1) {
+								entry.possibility.splice(index, 1);
+							}
+						});
+					});
+				}
+			}
+		}
+		for (let i = 0;i < 9;i++) {
+			resetEntries((i + 1), 'squareNo');
+			resetEntries(i, 'row');
+			resetEntries(i, 'column');
+		}
+		this.retry.next();
+		alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
 	}
 	validateEntry = (e, row, colm) => {
 		const keyCode = e.which || e.keyCode;
@@ -138,17 +177,17 @@ export class AppComponent {
 		if (keyCode < 48 || keyCode > 57) {
 			alert('Only numeric value is allowed.');
 			return false;
-		} 
-	
+		}
+
 		var data = _.flatMap(this.data, (rw) => rw);
 		var arr = _.filter(this.data[row], (cell) => cell.value == value);
 		if (arr.length > 0) {
-			alert('Same row already has an entry of '+ value + '.');
+			alert('Same row already has an entry of ' + value + '.');
 			return false;
 		}
 
 		arr = _.filter(data, (cell) => cell.column == colm && cell.value == value);
-		if (arr.length > 0) { 
+		if (arr.length > 0) {
 			alert('Same column already has an entry of ' + value + '.');
 			return false;
 		}
