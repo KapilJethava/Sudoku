@@ -50,10 +50,12 @@ export class AppComponent {
 		}, (err) => console.log(err));
 
 		this.retry.subscribe(() => {
-			if (this.attempt < 100) {
+			if (this.attempt < 5) {
 				setTimeout(() => {
 					this.startSolving();
 				}, 200);
+			} else {
+				alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
 			}
 			console.log("Attempt => ", this.attempt);
 			this.attempt++;
@@ -148,9 +150,9 @@ export class AppComponent {
 			for (let j = 0;j < entityArr.length;j++) {
 				var arr = _.filter(entityArr, (entry) => _.isEqual(entityArr[j].possibility, entry.possibility));
 				if (arr.length > 1 && arr.length == arr[0].possibility.length) {
-					console.log("found in "+ propName +"=>", arr);
+					console.log("found in " + propName + "=>", arr);
 					let filtered = _.filter(entityArr, (entry) => !arr.includes(entry));
-					console.log("filtered in " + propName +  "=>", filtered);
+					console.log("filtered in " + propName + "=>", filtered);
 					_.forEach(arr[0].possibility, (value) => {
 						_.forEach(filtered, (entry) => {
 							let index = entry.possibility.indexOf(value);
@@ -168,7 +170,6 @@ export class AppComponent {
 			resetEntries(i, 'column');
 		}
 		this.retry.next();
-		alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
 	}
 	validateEntry = (e, row, colm) => {
 		const keyCode = e.which || e.keyCode;
