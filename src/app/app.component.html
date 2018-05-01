@@ -1,13 +1,14 @@
 <h2 class="title-msg font">Sudoku Resolver</h2>
 <div class="container">
-	<div class="flex">
-		<div class="row" *ngFor="let row of data; let i=index">
-			<input class="text" type="text" 
-			minlength="1" maxlength="1" (keydown)="validateEntry($event, i, j)"
-			*ngFor="let cell of row; let j=index" [disabled]="data[i][j].value != ''" [(ngModel)]="data[i][j].value"
-			 [ngClass]="getClass(i,j)" (change)="resetPossiblity(i,j)" />
-		</div>
-	</div>
+	<table class="table">
+		<tr *ngFor="let row of data; let i=index">
+			<td *ngFor="let cell of row; let j=index">
+				<input class="text" type="text" minlength="1" maxlength="1" (keydown)="validateEntry($event, i, j)" [disabled]="data[i][j].value != ''"
+				 [(ngModel)]="data[i][j].value" [ngClass]="getClass(i,j)" (change)="resetPossiblity(i,j)" 
+				 [ngStyle]="{'font-weight': cell.userEntered?'bold':'normal' }"/>
+			</td>
+		</tr>
+	</table>
 	<div class="info-container">
 		<h2 class="success-msg" *ngIf="show">Hurray, resolved the sudoku! Try another!</h2>
 
@@ -24,10 +25,15 @@
 	&copy; 2018 Kapil Jethava Inc. India
 </div>
 
-<div class="flex" *ngIf="debug">
-	<div class="row" *ngFor="let row of data; let i=index">
-		<div class="values"  *ngFor="let cell of row; let j=index">
-			{{ cell | json }}
-		</div>
-	</div>
-</div>
+<table class="grid" *ngIf="debug">
+	<tr *ngFor="let row of data; let i=index">
+		<td class="gridtd" *ngFor="let cell of row; let j=index">
+			<div class="cell-table" *ngIf="cell.value==''">
+				<div class="poss" *ngFor="let poss of cell.possibility;">{{poss}}</div>
+			</div>
+			<div class="value" *ngIf="cell.value !=''">
+				{{cell.value}}
+			</div>
+		</td>
+	</tr>
+</table>

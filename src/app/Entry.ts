@@ -5,6 +5,7 @@ export class Entry {
 	value: any;
 	possibility: Array<number>;
 	squareNo: number;
+	userEntered: Boolean;
 
 	constructor(row, column, value = '', possibility = []) {
 		this.row = row;
@@ -12,6 +13,7 @@ export class Entry {
 		this.value = value;
 		this.squareNo = (Math.floor(column / 3) + 1) + (Math.floor(row / 3) * 3);
 		this.possibility = (possibility.length == 0) ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : possibility;
+		this.userEntered = false;
 	}
 
 	setPossibilities(data) {
