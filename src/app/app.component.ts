@@ -62,6 +62,7 @@ export class AppComponent {
 		// console.log("second level resolving started");
 		var data = _.flatMap(this.data, (row) => row);
 		var arr = [];
+		var reIterationRequired = false;
 		for (let value = 1;value < 10;value++) {
 			for (let i = 0;i < 9;i++) {
 				// For Row
@@ -70,8 +71,17 @@ export class AppComponent {
 					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
 					// console.log("Row Resolved=>", arr, value);
 					return;
-				} else {
-					
+				} else if (arr.length > 0) {
+					// if all the array element has same square num then remove that value from possibility array of other square cells
+					let sqNo = arr[0].squareNo;
+					let filtered = _.filter(arr, (val) => val.squareNo == sqNo);
+					if (filtered.length == arr.length) {
+						filtered = _.filter(data, (entry) => entry.row != i && entry.squareNo == sqNo && entry.possibility.includes(value))
+						_.forEach(filtered, (entry) => {
+							let index = entry.possibility.indexOf(value);
+							entry.possibility.splice(index, 1);
+						});
+					}
 				}
 			}
 
@@ -82,6 +92,18 @@ export class AppComponent {
 					this.subject.next({ row: arr[0].row, column: arr[0].column, value: value });
 					// console.log("Column Resolved=>", arr, value);
 					return;
+				} else if(arr.length > 0) {
+					// check weather some column in array is assumed to have some specific values? if so then other cells of that square should not have that value as possibility
+					let sqNo = arr[0].squareNo;
+					let filtered = _.filter(arr, (val)=>val.squareNo == sqNo);
+					if(filtered.length == arr.length) {
+						filtered = _.filter(data, (entry) => entry.column != i && entry.squareNo == sqNo && entry.possibility.includes(value))
+						_.forEach(filtered, (entry) => {
+							let index = entry.possibility.indexOf(value);
+							entry.possibility.splice(index, 1);
+						});
+						reIterationRequired = true;
+					}
 				}
 			}
 
@@ -95,6 +117,10 @@ export class AppComponent {
 				}
 			}
 		}
+		
+
+
+
 		this.debug = true;
 		alert("Its seems like you have entered very less entries to resolve, please reset and provide more entries to resolve this sudoku.");
 	};
@@ -132,7 +158,7 @@ export class AppComponent {
 			alert('Same square already has an entry of ' + value + '.');
 			return false;
 		}
-
+		entry.userEntered = true;
 		return true;
 	};
 
